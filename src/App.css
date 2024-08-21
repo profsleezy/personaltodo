@@ -1,38 +1,124 @@
-.App {
+/* src/App.css */
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f7f7f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.todo-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #5e5e5e;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.input-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #dedede;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-right: 10px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #a6dcef;
+}
+
+/* src/App.css */
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #a6dcef;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #82c4e6;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.task-item {
+  background-color: #e8f0fe;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease, text-decoration 0.3s ease;
 }
 
-.App-link {
-  color: #61dafb;
+.task-item.completed {
+  background-color: #d1f7d6;
+  text-decoration: line-through;
+  color: #b0b0b0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.task-item span {
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+
+.task-item button {
+  background-color: #ff6b6b;
+  margin-left: 10px;
+}
+
+.task-item button:hover {
+  background-color: #ff4c4c;
+}
+
+@media (max-width: 480px) {
+  .todo-container {
+    width: 90%;
   }
-  to {
-    transform: rotate(360deg);
+
+  button, input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .title {
+    font-size: 20px;
   }
 }
