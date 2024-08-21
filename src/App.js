@@ -1,60 +1,119 @@
 // src/App.js
 
 import React, { useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./App.css";
 
-function App() {
-  const [tasks, setTasks] = useState([]);
-  const [input, setInput] = useState("");
+const App = () => {
+  const [tasks, setTasks] = useState({
+    todo: [
+      { id: "1", text: "Task 1", priority: "high" },
+      { id: "2", text: "Task 2", priority: "medium" },
+    ],
+    inProgress: [],
+    done: [],
+  });
+
+  const onDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+
+    const sourceColumn = tasks[source.droppableId];
+    const destColumn = tasks[destination.droppableId];
+
+    const sourceItems = [...sourceColumn];
+    const destItems = [...destColumn];
+
+    const [movedItem] = sourceItems.splice(source.index, 1);
+    destItems.splice(destination.index, 0, movedItem);
+
+    setTasks({
+      ...tasks,
+      [source.droppableId]: sourceItems,
+      [destination.droppableId]: destItems,
+    });
+  };
 
   const addTask = () => {
-    if (input.trim()) {
-      setTasks([...tasks, { text: input, completed: false }]);
-      setInput("");
+    const taskText = prompt("Enter task description:");
+    const taskPriority = prompt("Enter task priority (low, medium, high):");
+
+    if (taskText && taskPriority) {
+      const newTask = {
+        id: `${new Date().getTime()}`,
+        text: taskText,
+        priority: taskPriority.toLowerCase(),
+      };
+      setTasks({ ...tasks, todo: [...tasks.todo, newTask] });
     }
-  };
-
-  const toggleTask = (index) => {
-    const newTasks = tasks.map((task, i) => {
-      if (i === index) {
-        return { ...task, completed: !task.completed };
-      }
-      return task;
-    });
-    setTasks(newTasks);
-  };
-
-  const removeTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
   };
 
   return (
     <div className="app">
-      <div className="todo-container">
-        <h1 className="title">Pastel To-Do List</h1>
-        <div className="input-container">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Add a new task"
-          />
-          <button onClick={addTask}>Add</button>
-        </div>
-        <ul className="task-list">
-          {tasks.map((task, index) => (
-            <li
-              key={index}
-              className={`task-item ${task.completed ? "completed" : ""}`}
-            >
-              <span onClick={() => toggleTask(index)}>{task.text}</span>
-              <button onClick={() => removeTask(index)}>Remove</button>
-            </li>
+      <h1 className="title">Kanban To-Do List</h1>
+      <button className="add-task" onClick={addTask}>
+        Add Task
+      </button>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="board">
+          {Object.keys(tasks).map((column) => (
+            <Column key={column} title={column} tasks={tasks[column]} />
           ))}
-        </ul>
-      </div>
+        </div>
+      </DragDropContext>
     </div>
   );
-}
+};
+
+const Column = ({ title, tasks }) => {
+  const getBackgroundColor = (priority) => {
+    switch (priority) {
+      case "high":
+        return "#ffadad";
+      case "medium":
+        return "#ffd6a5";
+      case "low":
+        return "#caffbf";
+      default:
+        return "#e8f0fe";
+    }
+  };
+
+  return (
+    <div className="column">
+      <h2>{title.replace(/([A-Z])/g, " $1")}</h2>
+      <Droppable droppableId={title}>
+        {(provided) => (
+          <div
+            className="task-list"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {tasks.map((task, index) => (
+              <Draggable key={task.id} draggableId={task.id} index={index}>
+                {(provided) => (
+                  <div
+                    className="task-item"
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                    style={{
+                      backgroundColor: getBackgroundColor(task.priority),
+                      ...provided.draggableProps.style,
+                    }}
+                  >
+                    {task.text} <span className="priority">{task.priority}</span>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </div>
+  );
+};
 
 export default App;
