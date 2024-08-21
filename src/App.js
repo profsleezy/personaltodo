@@ -11,47 +11,41 @@ const App = () => {
 
   const [taskInput, setTaskInput] = useState("");
   const [priority, setPriority] = useState("medium");
+  const [darkMode, setDarkMode] = useState(false); // Dark mode state
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source } = result;
 
-    // If there's no destination, exit
     if (!destination) return;
 
-    // If the item was dropped in the same place, exit
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
 
     const startColumn = tasks[source.droppableId];
     const endColumn = tasks[destination.droppableId];
 
-    // Moving items within the same column
     if (source.droppableId === destination.droppableId) {
       const newTaskOrder = Array.from(startColumn);
       const [movedTask] = newTaskOrder.splice(source.index, 1);
       newTaskOrder.splice(destination.index, 0, movedTask);
 
-      setTasks((prev) => ({
-        ...prev,
+      setTasks({
+        ...tasks,
         [source.droppableId]: newTaskOrder,
-      }));
+      });
     } else {
-      // Moving items to another column
       const startTaskOrder = Array.from(startColumn);
       const endTaskOrder = Array.from(endColumn);
 
       const [movedTask] = startTaskOrder.splice(source.index, 1);
       endTaskOrder.splice(destination.index, 0, movedTask);
 
-      setTasks((prev) => ({
-        ...prev,
+      setTasks({
+        ...tasks,
         [source.droppableId]: startTaskOrder,
         [destination.droppableId]: endTaskOrder,
-      }));
+      });
     }
   };
 
@@ -66,18 +60,15 @@ const App = () => {
       priority,
     };
 
-    setTasks((prev) => ({
-      ...prev,
-      todo: [...prev.todo, newTask],
-    }));
+    setTasks({ ...tasks, todo: [...tasks.todo, newTask] });
     setTaskInput("");
   };
 
   return (
-    <div className="app">
+    <div className={`app ${darkMode ? "dark-mode" : ""}`}>
       <header className="header">
         <h1>Kanban To-Do List</h1>
-        <form className="task-input" onSubmit={addTask}>
+        <div className="task-input">
           <input
             type="text"
             value={taskInput}
@@ -92,8 +83,11 @@ const App = () => {
             <option value="medium">Medium</option>
             <option value="low">Low</option>
           </select>
-          <button type="submit">Add Task</button>
-        </form>
+          <button onClick={addTask}>Add Task</button>
+          <button onClick={() => setDarkMode(!darkMode)} className="dark-mode-toggle">
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+        </div>
       </header>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="board">
