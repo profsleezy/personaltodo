@@ -15,24 +15,35 @@ const App = () => {
   const [priority, setPriority] = useState("medium");
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source } = result;
 
     if (!destination) return;
 
-    const sourceColumn = tasks[source.droppableId];
-    const destColumn = tasks[destination.droppableId];
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
 
-    const sourceItems = [...sourceColumn];
-    const destItems = [...destColumn];
+    const startColumn = tasks[source.droppableId];
+    const endColumn = tasks[destination.droppableId];
 
-    const [movedItem] = sourceItems.splice(source.index, 1);
-    destItems.splice(destination.index, 0, movedItem);
+    const startItems = Array.from(startColumn);
+    const [movedItem] = startItems.splice(source.index, 1);
 
-    setTasks({
-      ...tasks,
-      [source.droppableId]: sourceItems,
-      [destination.droppableId]: destItems,
-    });
+    if (source.droppableId === destination.droppableId) {
+      startItems.splice(destination.index, 0, movedItem);
+      setTasks({
+        ...tasks,
+        [source.droppableId]: startItems,
+      });
+    } else {
+      const endItems = Array.from(endColumn);
+      endItems.splice(destination.index, 0, movedItem);
+      setTasks({
+        ...tasks,
+        [source.droppableId]: startItems,
+        [destination.droppableId]: endItems,
+      });
+    }
   };
 
   const addTask = (e) => {
