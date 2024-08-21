@@ -134,8 +134,8 @@ body {
 
 /* Dark Mode Styles */
 .dark-mode body {
-  background-color: #2c2c2c;
-  color: #d3d3d3;
+  background-color: #2c2c2c !important; /* Ensure the background color is applied */
+  color: #d3d3d3 !important;
 }
 
 .dark-mode .app {
