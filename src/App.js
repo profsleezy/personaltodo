@@ -6,13 +6,13 @@ import "./App.css";
 
 const App = () => {
   const [tasks, setTasks] = useState({
-    todo: [
-      { id: "1", text: "Task 1", priority: "high" },
-      { id: "2", text: "Task 2", priority: "medium" },
-    ],
+    todo: [],
     inProgress: [],
     done: [],
   });
+
+  const [taskInput, setTaskInput] = useState("");
+  const [priority, setPriority] = useState("medium");
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -35,26 +35,43 @@ const App = () => {
     });
   };
 
-  const addTask = () => {
-    const taskText = prompt("Enter task description:");
-    const taskPriority = prompt("Enter task priority (low, medium, high):");
+  const addTask = (e) => {
+    e.preventDefault();
 
-    if (taskText && taskPriority) {
-      const newTask = {
-        id: `${new Date().getTime()}`,
-        text: taskText,
-        priority: taskPriority.toLowerCase(),
-      };
-      setTasks({ ...tasks, todo: [...tasks.todo, newTask] });
-    }
+    if (taskInput.trim() === "") return;
+
+    const newTask = {
+      id: `${new Date().getTime()}`,
+      text: taskInput,
+      priority,
+    };
+
+    setTasks({ ...tasks, todo: [...tasks.todo, newTask] });
+    setTaskInput("");
   };
 
   return (
     <div className="app">
-      <h1 className="title">Kanban To-Do List</h1>
-      <button className="add-task" onClick={addTask}>
-        Add Task
-      </button>
+      <header className="header">
+        <h1>Kanban To-Do List</h1>
+        <form className="task-input" onSubmit={addTask}>
+          <input
+            type="text"
+            value={taskInput}
+            onChange={(e) => setTaskInput(e.target.value)}
+            placeholder="Enter a new task"
+          />
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <button type="submit">Add Task</button>
+        </form>
+      </header>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="board">
           {Object.keys(tasks).map((column) => (
