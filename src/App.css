@@ -76,7 +76,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   padding: 20px;
-  margin-top: 120px; /* Adjusted for the header height */
+  margin-top: 120px;
   width: 100%;
   height: calc(100% - 120px);
   overflow-y: auto;
@@ -103,7 +103,15 @@ body {
 .task-list {
   flex-grow: 1;
   overflow-y: auto;
-  max-height: calc(100vh - 180px); /* Adjusted for header and padding */
+  max-height: calc(100vh - 180px);
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.draggingOver {
+  background-color: #e0e0e0;
 }
 
 .task-item {

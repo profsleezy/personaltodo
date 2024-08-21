@@ -13,34 +13,45 @@ const App = () => {
   const [priority, setPriority] = useState("medium");
 
   const onDragEnd = (result) => {
-    const { destination, source } = result;
+    const { destination, source, draggableId } = result;
 
+    // If there's no destination, exit
     if (!destination) return;
 
-    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+    // If the item was dropped in the same place, exit
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
       return;
     }
 
     const startColumn = tasks[source.droppableId];
     const endColumn = tasks[destination.droppableId];
 
-    const startItems = Array.from(startColumn);
-    const [movedItem] = startItems.splice(source.index, 1);
-
+    // Moving items within the same column
     if (source.droppableId === destination.droppableId) {
-      startItems.splice(destination.index, 0, movedItem);
-      setTasks({
-        ...tasks,
-        [source.droppableId]: startItems,
-      });
+      const newTaskOrder = Array.from(startColumn);
+      const [movedTask] = newTaskOrder.splice(source.index, 1);
+      newTaskOrder.splice(destination.index, 0, movedTask);
+
+      setTasks((prev) => ({
+        ...prev,
+        [source.droppableId]: newTaskOrder,
+      }));
     } else {
-      const endItems = Array.from(endColumn);
-      endItems.splice(destination.index, 0, movedItem);
-      setTasks({
-        ...tasks,
-        [source.droppableId]: startItems,
-        [destination.droppableId]: endItems,
-      });
+      // Moving items to another column
+      const startTaskOrder = Array.from(startColumn);
+      const endTaskOrder = Array.from(endColumn);
+
+      const [movedTask] = startTaskOrder.splice(source.index, 1);
+      endTaskOrder.splice(destination.index, 0, movedTask);
+
+      setTasks((prev) => ({
+        ...prev,
+        [source.droppableId]: startTaskOrder,
+        [destination.droppableId]: endTaskOrder,
+      }));
     }
   };
 
@@ -55,7 +66,10 @@ const App = () => {
       priority,
     };
 
-    setTasks({ ...tasks, todo: [...tasks.todo, newTask] });
+    setTasks((prev) => ({
+      ...prev,
+      todo: [...prev.todo, newTask],
+    }));
     setTaskInput("");
   };
 
@@ -110,15 +124,15 @@ const Column = ({ title, tasks }) => {
     <div className="column">
       <h2>{title.replace(/([A-Z])/g, " $1")}</h2>
       <Droppable droppableId={title}>
-        {(provided) => (
+        {(provided, snapshot) => (
           <div
-            className="task-list"
+            className={`task-list ${snapshot.isDraggingOver ? "draggingOver" : ""}`}
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
             {tasks.map((task, index) => (
               <Draggable key={task.id} draggableId={task.id} index={index}>
-                {(provided) => (
+                {(provided, snapshot) => (
                   <div
                     className="task-item"
                     {...provided.draggableProps}
@@ -127,6 +141,7 @@ const Column = ({ title, tasks }) => {
                     style={{
                       backgroundColor: getBackgroundColor(task.priority),
                       ...provided.draggableProps.style,
+                      opacity: snapshot.isDragging ? 0.5 : 1,
                     }}
                   >
                     {task.text} <span className="priority">{task.priority}</span>
