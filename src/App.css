@@ -138,6 +138,10 @@ body {
   color: #d3d3d3;
 }
 
+.dark-mode .app {
+  background-color: #2c2c2c; /* Ensure the app container covers the whole background */
+}
+
 .dark-mode .header {
   background-color: #3a3a3a;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
